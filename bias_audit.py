@@ -80,3 +80,60 @@ for bar, rate in zip(bars2, race_rates):
 plt.tight_layout()
 plt.savefig('bias_audit_chart.png')
 plt.show()
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import classification_report
+
+# Preparing data for modelling 
+# Convert income to binary: 1 = earns >50k, 0 = earns <=50k
+df['income_binary'] = (df['income'] == '>50K').astype(int)
+
+# Select features for the model
+features = ['age', 'education_num', 'hours_per_week', 'gender', 'race']
+df_model = df[features + ['income_binary']].copy()
+
+# Encode categorical variables (gender, race) into numbers
+le_gender = LabelEncoder()
+le_race = LabelEncoder()
+df_model['gender_encoded'] = le_gender.fit_transform(df_model['gender'])
+df_model['race_encoded'] = le_race.fit_transform(df_model['race'])
+
+# Final feature set
+X = df_model[['age', 'education_num', 'hours_per_week', 
+              'gender_encoded', 'race_encoded']]
+y = df_model['income_binary']
+
+# Split into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42)
+
+from sklearn.preprocessing import StandardScaler
+
+# Scaling the features
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Train model on scaled data
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train_scaled, y_train)
+
+print("\n--- MODEL PERFORMANCE ---")
+y_pred = model.predict(X_test_scaled)
+print(classification_report(y_test, y_pred))
+
+# --- BIAS MEASUREMENT BY GENDER ---
+print("\n--- FALSE NEGATIVE RATE BY GENDER ---")
+X_test_full = X_test.copy()
+X_test_full['actual'] = y_test.values
+X_test_full['predicted'] = y_pred
+X_test_full['gender'] = df_model.loc[X_test.index, 'gender'].values
+
+for gender in ['Male', 'Female']:
+    group = X_test_full[X_test_full['gender'] == gender]
+    actual_positive = group[group['actual'] == 1]
+    false_negatives = actual_positive[actual_positive['predicted'] == 0]
+    fnr = len(false_negatives) / len(actual_positive) * 100
+    print(f"{gender}: False Negative Rate = {fnr:.1f}%")
