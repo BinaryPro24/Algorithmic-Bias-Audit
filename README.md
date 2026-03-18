@@ -38,4 +38,3 @@ This project demonstrates a complete audit pipeline; from identifying disparitie
 - Pandas
 - Matplotlib
 - Scikit-learn
-`
