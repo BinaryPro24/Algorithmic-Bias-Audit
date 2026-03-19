@@ -106,17 +106,22 @@ X = df_model[['age', 'education_num', 'hours_per_week',
 y = df_model['income_binary']
 
 # Split into training and test sets
+# 80% of data used to train the model, 20% reserved for testing
+# random_state = 42 ensures reproducibility of results
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42)
 
 from sklearn.preprocessing import StandardScaler
 
-# Scaling the features
+# StandardScaler normalises features to the same scale
+# Prevents age (0-90) from dominating hours_per_week (0-99)
+# Essential for Logistic Regression to work correctly
 scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Train model on scaled data
+# Logistic Regression predicts binary outcomes (high income vs low income)
+# max_iter = 1000 gives the model enough steps to converge on a solution
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train_scaled, y_train)
 
@@ -137,3 +142,7 @@ for gender in ['Male', 'Female']:
     false_negatives = actual_positive[actual_positive['predicted'] == 0]
     fnr = len(false_negatives) / len(actual_positive) * 100
     print(f"{gender}: False Negative Rate = {fnr:.1f}%")
+
+#  False Negative = model predicted <=50k but person actually earns >50k
+# A high FNR for women means the model systematically underestimates 
+# female earning potential, critical failure in a loan approval context
