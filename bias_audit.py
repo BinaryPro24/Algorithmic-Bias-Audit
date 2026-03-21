@@ -136,6 +136,9 @@ X_test_full['actual'] = y_test.values
 X_test_full['predicted'] = y_pred
 X_test_full['gender'] = df_model.loc[X_test.index, 'gender'].values
 
+#  False Negative = model predicted <=50k but person actually earns >50k
+# A high FNR for women means the model systematically underestimates 
+# female earning potential, critical failure in a loan approval context
 for gender in ['Male', 'Female']:
     group = X_test_full[X_test_full['gender'] == gender]
     actual_positive = group[group['actual'] == 1]
@@ -143,6 +146,14 @@ for gender in ['Male', 'Female']:
     fnr = len(false_negatives) / len(actual_positive) * 100
     print(f"{gender}: False Negative Rate = {fnr:.1f}%")
 
-#  False Negative = model predicted <=50k but person actually earns >50k
-# A high FNR for women means the model systematically underestimates 
-# female earning potential, critical failure in a loan approval context
+# Bias measurement by race
+print("\n--- FALSE NEGATIVE RATE BY RACE ---")
+X_test_full['race'] = df_model.loc[X_test.index, 'race'].values
+
+for race in df['race'].unique():
+    group = X_test_full[X_test_full['race'] == race]
+    actual_positive = group[group['actual'] == 1]
+    if len(actual_positive) > 0:
+        false_negatives = actual_positive[actual_positive['predicted'] == 0]
+        fnr = len(false_negatives) / len(actual_positive) * 100
+        print(f"{race}: False Negative Rate = {fnr:.1f}%")
