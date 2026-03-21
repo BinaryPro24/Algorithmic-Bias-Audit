@@ -48,8 +48,20 @@ Under the EU AI Act, any high-risk AI system used in banking, credit scoring or 
 
 This project demonstrates a complete audit pipeline; from identifying disparities in raw training data to proving a trained model replicates and amplifies those disparities.
 
+### Fairlearn Audit - Disparity Scores
+Using the Fairlearn library to quantify bias formally:
+
+**Gender Disparity Score: 0.359**
+**Race Disparity Score: 0.293**
+
+A disparity score above 0.1 is considered significant in fairness research.
+The gender disparity of 0.359 is more than 3x the acceptable threshold, meaning this model would formally **fail** a fairness audit in a regulated financial services context.
+
+This is the exact metric compliance teams use to determine whether an AI system is fit for deployment under the EU AI Act.
+
 ## Tech Stack
 - Python 3.9
 - Pandas
 - Matplotlib
 - Scikit-learn
+- Fairlearn

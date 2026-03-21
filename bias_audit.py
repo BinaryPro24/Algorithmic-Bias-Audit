@@ -1,6 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from fairlearn.metrics import MetricFrame, false_negative_rate
+from sklearn.metrics import accuracy_score
 
 # Load the UCI Adult Income dataset directly from the web
 # This dataset contains census data used to predict income levels
@@ -157,3 +159,35 @@ for race in df['race'].unique():
         false_negatives = actual_positive[actual_positive['predicted'] == 0]
         fnr = len(false_negatives) / len(actual_positive) * 100
         print(f"{race}: False Negative Rate = {fnr:.1f}%")
+
+# Fairlearn Bias Audit
+print("\n--- FAIRLEARN AUDIT BY GENDER ---")
+
+# Create a MetricFrame to measure false negative rate by gender
+gender_metric = MetricFrame(
+    metrics=false_negative_rate,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=X_test_full['gender']
+)
+
+print("False Negative Rate by Gender: ")
+print(gender_metric.by_group)
+print(f"\nOverall False Negative Rate: {gender_metric.overall:.3f}")
+print(f"Disparity (max - min): {gender_metric.difference():.3f}")
+
+
+print("\n--- FAIRLEARN AUDIT BY RACE ---")
+
+# Create a MetricFrame to measure false negative rate by race
+race_metric = MetricFrame(
+    metrics=false_negative_rate,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=X_test_full['race']
+)
+
+print("False Negative Rate by Race:")
+print(race_metric.by_group)
+print(f"\nOverall False Negative Rate: {race_metric.overall:.3f}")
+print(f"Disparity (max - min): {race_metric.difference():.3f}")
