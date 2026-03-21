@@ -28,6 +28,21 @@ When a woman actually earns over $50k, the model gets it wrong **92.3% of the ti
 If a bank used this model for loan approvals, a high-earning woman would be systematically denied or underserved; not because of her finances but 
 because of her demographics.
 
+## Race False Negative Rates
+- **White: 60.7%**
+- **Asian-Pacific Islander: 61.3%**
+- **Other: 66.7%**
+- **Black: 78.5%**
+- **Amer-Indian-Eskimo: 90.0%**
+
+## The Compounding Effect
+A high-earning Black or Native American woman faces bias from two directions 
+simultaneously; gender and race false negative rates stacking on top of each 
+other. In a loan approval context, that's not just unfair but it's a legal 
+liability under the EU AI Act.
+
+This compounding effect is the most dangerous form of algorithmic bias because it's invisible without a full intersectional audit.
+
 ## Why This Matters
 Under the EU AI Act, any high-risk AI system used in banking, credit scoring or employment must be audited for bias before deployment. Companies that fail to comply face fines of up to €30 million.
 
